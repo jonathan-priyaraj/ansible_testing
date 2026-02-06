@@ -1,6 +1,7 @@
 ---
 - name: Play for Install Nginx on WebServers
-  hosts: pvt
+  hosts: pvt 
+  #hosts: pvt:!testserver01:!testserver02 
   gather_facts: yes
   become: yes
   become_user: root
