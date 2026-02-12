@@ -12,3 +12,7 @@ testserver03 ansible_port=22 ansible_host=${pvttestserver03} ansible_user=ubuntu
 ${testserver01}
 ${testserver02}
 ${testserver03}
+
+[all:children]
+pub
+pvt
