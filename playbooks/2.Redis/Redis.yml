@@ -5,18 +5,28 @@
   tasks:
     - name: Install Redis dependencies
       apt:
-        name: "{{ item }}"
+        name:
+          - build-essential
+          - tcl
+          - pkg-config
+          - libjemalloc-dev
         state: present
         update_cache: yes
-      loop:
-        - build-essential
-        - tcl
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '24.04'
 
     - name: Check Redis Status
       shell: systemctl status redis --no-pager
       register: redis_status
       ignore_errors: true
+
+    - name: Create redis system user
+      user:
+        name: redis
+        system: yes
+        shell: /usr/sbin/nologin
+        home: /var/lib/redis
+        createhome: no
+      when: redis_status.rc != 0
 
     - name: Download and extract Redis source code
       get_url:
@@ -42,6 +52,8 @@
         name:
           - make
           - gcc
+          - pkg-config
+          - libjemalloc-dev
         state: present
         update_cache: yes
       when: ansible_os_family == "Debian"
@@ -74,16 +86,19 @@
         owner: root
         group: root
         mode: "0644"
-      notify:
-        - Restart Redis
-        - Backup Redis Conf File
+      register: redis_service_created
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      when: redis_service_created.changed
 
     - name: Start Redis service
       systemd:
         name: redis
         state: started
         enabled: yes
-      when: redis_status.rc != 0
+        daemon_reload: yes
 
     - name: Checking Delegate Option
       shell: hostname
