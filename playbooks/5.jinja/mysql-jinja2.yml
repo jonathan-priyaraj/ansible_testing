@@ -34,7 +34,7 @@
       become: yes
     - name: Copy the index.j2 Template to index destination folder.
       template: >
-        src=/root/Ansible-Testing/playbooks/5.Jinja/mysql_conf.j2
+        src=/root/ansible/playbooks/5.jinja/mysql_conf.j2
         dest=/etc/mysql/mysql.conf.d/mysqld.cnf
         owner=root
         group=root
