@@ -5,12 +5,13 @@
   tasks:
     - name: Install Redis dependencies
       apt:
-        name: "{{ item }}"
+        name:
+          - build-essential
+          - tcl
+          - pkg-config
+          - libjemalloc-dev
         state: present
         update_cache: yes
-      loop:
-        - build-essential
-        - tcl
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '24.04'
 
     - name: Check Redis Status
@@ -51,6 +52,8 @@
         name:
           - make
           - gcc
+          - pkg-config
+          - libjemalloc-dev
         state: present
         update_cache: yes
       when: ansible_os_family == "Debian"
