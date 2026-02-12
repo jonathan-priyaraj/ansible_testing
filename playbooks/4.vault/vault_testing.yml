@@ -16,20 +16,29 @@
           6638
 
   tasks:
+    - name: Install passlib on control machine
+      pip:
+        name: passlib
+        state: present
+      delegate_to: localhost
+      become: no
+      run_once: yes
+
     - name: Create .aws folder
       shell: mkdir -p /root/.aws
       ignore_errors: yes
-    - name: Copy Encrypted File To /tmp
+    - name: Copy Encrypted Files To /tmp
       copy:
-        src: /tmp/{{item}} #This Encrypted File Must Be Created Prior To Running The Playbook.
-        dest: /tmp/{{item}}
+        src: "/tmp/{{ item }}"
+        dest: "/tmp/{{ item }}"
         owner: root
         group: root
         mode: "0600"
-      with_items:
+      loop:
         - aws_creds
         - tls.key
         - tls.crt
+      ignore_errors: yes
     - name: Copy Encrypted Credentials File To .aws folder
       copy:
         src: /tmp/aws_creds #This Encrypted File Must Be Created Prior To Running The Playbook.
@@ -49,20 +58,20 @@
     - name: Print VPC ID
       debug:
         var: vpcs
-    - name: Creating admin "{{item}}"
+    - name: Creating admin "{{ item }}"
       user:
-        name: "{{item}}"
+        name: "{{ item }}"
         state: present
-        comment: Admin User "{{item}}"
-        groups: root
+        comment: "Admin User {{ item }}"
+        groups: root,sudo
         shell: /bin/bash
-        group: sudo
-        password: "{{ '%s' | format(user_password) | regex_replace('\n', '') | password_hash('sha512') }}"
+        password: "{{ user_password | regex_replace('\n', '') | password_hash('sha512', rounds=5000) }}"
         password_expire_min: 1
-      with_items:
+      loop:
         - Avinash
         - Saikiran
         - Gnane
+      ignore_errors: yes
     - name: Replace Password Authentication To Yes
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
