@@ -18,6 +18,15 @@
       register: redis_status
       ignore_errors: true
 
+    - name: Create redis system user
+      user:
+        name: redis
+        system: yes
+        shell: /usr/sbin/nologin
+        home: /var/lib/redis
+        createhome: no
+      when: redis_status.rc != 0
+
     - name: Download and extract Redis source code
       get_url:
         url: "http://download.redis.io/releases/redis-6.2.5.tar.gz"
