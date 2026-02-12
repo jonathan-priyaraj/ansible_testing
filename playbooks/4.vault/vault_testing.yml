@@ -17,11 +17,12 @@
 
   tasks:
     - name: Install passlib on control machine
-      pip:
-        name: passlib
+      apt:
+        name: python3-passlib
         state: present
+        update_cache: yes
       delegate_to: localhost
-      become: no
+      become: yes
       run_once: yes
 
     - name: Create .aws folder
