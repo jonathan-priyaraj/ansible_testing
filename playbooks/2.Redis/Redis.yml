@@ -74,16 +74,19 @@
         owner: root
         group: root
         mode: "0644"
-      notify:
-        - Restart Redis
-        - Backup Redis Conf File
+      register: redis_service_created
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+      when: redis_service_created.changed
 
     - name: Start Redis service
       systemd:
         name: redis
         state: started
         enabled: yes
-      when: redis_status.rc != 0
+        daemon_reload: yes
 
     - name: Checking Delegate Option
       shell: hostname
