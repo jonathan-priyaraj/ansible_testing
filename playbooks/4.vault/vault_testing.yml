@@ -83,6 +83,10 @@
         - Restart SSH Service
   handlers:
     - name: Restart SSH Service
-      shell: service sshd restart
+      systemd:
+        name: ssh
+        state: restarted
+      become: yes
+
     - name: Restart elastic-agent
       shell: sudo heartbeat setup && sudo service heartbeat-elastic start
