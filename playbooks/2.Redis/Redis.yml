@@ -1,12 +1,13 @@
 ---
 - name: Install Redis Server
-  hosts: testserver01
+  hosts: all
   become: true
   tasks:
     - name: Install Redis dependencies
       apt:
         name: "{{ item }}"
         state: present
+        update_cache: yes
       loop:
         - build-essential
         - tcl
@@ -42,6 +43,7 @@
           - make
           - gcc
         state: present
+        update_cache: yes
       when: ansible_os_family == "Debian"
 
     - name: Compile and install Redis
